@@ -1,3 +1,11 @@
 from django.shortcuts import render
+from .models import Item
 
-# Create your views here.
+
+def item(request, id):
+    item = Item.objects.get(pk=id)
+    data = {
+        'title': 'Item',
+        'item': item
+    }
+    return render(request, 'main/item.html', data)

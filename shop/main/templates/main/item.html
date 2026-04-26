@@ -1,0 +1,11 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="item">
+    <p>{{ item.name }}</p>
+    <p>{{ item.description }}</p>
+    <p>{{ item.price }} {{ item.currency.upper }}</p>
+</div>
+<button type="submit">Buy</button>
+
+{% endblock %}
