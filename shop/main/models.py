@@ -4,8 +4,8 @@ from django.db import models
 
 class Item(models.Model):
     class Currency(models.TextChoices):
-        dollar = 'usd'
-        ruble = 'rub'
+        DOLLAR = 'usd', 'Доллар'
+        RUBLE = 'rub', 'Рубль'
 
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -24,15 +24,24 @@ class Item(models.Model):
 
 
 class Order(models.Model):
+    class Status(models.TextChoices):
+        CART = 'cart', 'Корзина'
+        PAID = 'paid', 'Оплачено'
+        FAILED = 'failed', 'Ошибка'
+
     items = models.ManyToManyField('Item')
     currency = models.CharField(choices=Item.Currency.choices, max_length=6)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, editable=False, default=0)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False, default=0)
     discount = models.ForeignKey('Discount', related_name='orders',
                                  on_delete=models.SET_NULL, null=True, blank=True)
     tax = models.ForeignKey('Tax', related_name='orders',
                             on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(choices=Status.choices, max_length=10, default=Status.CART)
     stripe_payment_intent_id = models.CharField(blank=True, max_length=255)
+    session_key = models.CharField(max_length=40, blank=True, null=True)
+    time_create = models.DateTimeField(auto_now_add=True)
+    time_update = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Заказ'
@@ -64,6 +73,7 @@ class Order(models.Model):
 class Discount(models.Model):
     name = models.CharField(max_length=255)
     percent_off = models.DecimalField(max_digits=5, decimal_places=2)
+    coupon = models.CharField(max_length=15, unique=True, null=True)
 
     class Meta:
         verbose_name = 'Скидка'

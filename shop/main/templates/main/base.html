@@ -10,7 +10,14 @@
 </head>
 <body>
     <div class="page_head">{{ title }}</div>
-
+    {% if messages %}
+        {% for message in messages %}
+            <div>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% block content %} {% endblock %}
+
 </body>
 </html>

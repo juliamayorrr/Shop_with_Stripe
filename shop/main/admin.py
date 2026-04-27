@@ -10,7 +10,7 @@ class ItemAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['amount', 'currency']
+    list_display = ['amount', 'currency', 'status']
 
 
 @admin.register(Discount)

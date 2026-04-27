@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="cart">
+    {% if order %}
+        {% for item in items %}
+            <p>{{ item.name }}</p>
+            <p>{{ item.description }}</p>
+            <p>{{ item.price }} {{ item.currency.upper }}</p>
+            <form action="{% url 'cart_remove' item.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Delete from cart</button>
+            </form>
+        {% endfor %}
+        <p>Total: {{ order.subtotal }} {{ order.currency.upper }}</p>
+        <p>Promocode: <input type="text" id="promo" placeholder="STRIPE"></p>
+        <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+        <button id="apply_promo_button">Apply</button>
+        <button id="buy-from-cart-button">Buy</button>
+    {% else %}
+        <p>Cart is empty</p>
+    {% endif %}
+</div>
+
+{% include 'main/payment_form.html' %}
+
+{% endblock %}
