@@ -17,8 +17,8 @@
             {% endfor %}
             <div class="cart_info">
                 <p><b>Total:</b> {{ order.subtotal }} {{ order.currency.upper }}</p>
-                <p><b>Discount:</b> {{ order.discount.percent_off | default:0 }} % (promo {{ order.discount.coupon }})</p>
-                <p><b>Tax:</b> {{ order.tax.precent | default:0 }} %</p>
+                <p><b>Discount:</b> {{ order.discount.percent_off | default:0 }} % {{ order.discount.coupon }}</p>
+                <p><b>Tax:</b> {{ order.tax.percent | default:0 }} %</p>
                 <p><b>Finally:</b> {{ order.amount }} {{ order.currency.upper }}</p>
                 <form action="{% url 'apply_promo' %}" method="post">
                     {% csrf_token %}

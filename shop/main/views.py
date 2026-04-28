@@ -29,6 +29,7 @@ def cart(request):
     }
     order = get_active_cart(request)
     if order:
+        order.calculate_total()
         data['order'] = order
         data['items'] = order.items.all()
 
