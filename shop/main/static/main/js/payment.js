@@ -41,7 +41,7 @@ if (buyFromItemButton) {
     buyFromItemButton.onclick = () => {
         const itemId = buyFromItemButton.dataset.itemId;
 
-        fetch('/buy/${itemId}')
+        fetch(`/buy/${itemId}`)
             .then(response => response.json())
             .then(data => {
                 initStripePayment(data.clientSecret);

@@ -1,24 +1,34 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-<div class="cart">
-    {% if order %}
-        {% for item in items %}
-            <p>{{ item.name }}</p>
-            <p>{{ item.description }}</p>
-            <p>{{ item.price }} {{ item.currency.upper }}</p>
-            <form action="{% url 'cart_remove' item.pk %}" method="post">
-                {% csrf_token %}
-                <button type="submit">Delete from cart</button>
-            </form>
-        {% endfor %}
-        <p>Total: {{ order.subtotal }} {{ order.currency.upper }}</p>
-        <p>Promocode: <input type="text" id="promo" placeholder="STRIPE"></p>
-        <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
-        <button id="apply_promo_button">Apply</button>
-        <button id="buy-from-cart-button">Buy</button>
+<div class="cart_url"><a href="{% url 'main' %}"><button>Main</button></a></div>
+    <div class="cart">
+        {% if order %}
+            {% for item in items %}
+            <div class="item">
+                <p><b>{{ item.name }}</b></p>
+                <p>{{ item.description }}</p>
+                <p><b>{{ item.price }} {{ item.currency.upper }}</b></p>
+                <form action="{% url 'cart_remove' item.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Delete from cart</button>
+                </form>
+            </div>
+            {% endfor %}
+            <div class="cart_info">
+                <p><b>Total:</b> {{ order.subtotal }} {{ order.currency.upper }}</p>
+                <p><b>Discount:</b> {{ order.discount.percent_off | default:0 }} % (promo {{ order.discount.coupon }})</p>
+                <p><b>Tax:</b> {{ order.tax.precent | default:0 }} %</p>
+                <p><b>Finally:</b> {{ order.amount }} {{ order.currency.upper }}</p>
+                <form action="{% url 'apply_promo' %}" method="post">
+                    {% csrf_token %}
+                    <b>Promocode:</b> <input type="text" name="promo" placeholder="STRIPE">
+                    <button type="submit">Apply</button>
+                </form><br>
+                <p><button id="buy-from-cart-button">Buy</button></p>
+            </div>
     {% else %}
-        <p>Cart is empty</p>
+        <br><p class="empty_cart">Cart is empty</p>
     {% endif %}
 </div>
 

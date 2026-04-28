@@ -10,5 +10,6 @@ urlpatterns = [
     path('buy/', views.buy_cart, name='buy_cart'),
     path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
     path('success/', views.success_payment, name='success_payment'),
-    path('apply_promo/', views.apply_promo, name='apply_promo')
+    path('apply_promo/', views.apply_promo, name='apply_promo'),
+    path('', views.main, name='main')
     ]

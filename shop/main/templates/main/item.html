@@ -2,15 +2,17 @@
 
 {% block content %}
 <div class="item">
-    <p>{{ item.name }}</p>
+    <p><b>{{ item.name }}</b></p>
     <p>{{ item.description }}</p>
-    <p>{{ item.price }} {{ item.currency.upper }}</p>
+    <p><b>{{ item.price }} {{ item.currency.upper }}</b></p>
 </div>
-<form action="{% url 'cart_add' item.pk %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Add to cart</button>
-</form>
-<button id="buy-from-item-button" data-item-id="{{ item.id }}">Buy</button>
+<div class="item_buttons">
+    <form action="{% url 'cart_add' item.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Add to cart</button>
+    </form><br>
+    <button id="buy-from-item-button" data-item-id="{{ item.id }}">Buy</button>
+</div>
 
 {% include 'main/payment_form.html' %}
 

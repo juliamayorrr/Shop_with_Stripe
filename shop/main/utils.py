@@ -1,7 +1,7 @@
 from main.models import Order
 
 
-def get_active_order(request):
+def get_active_cart(request):
     """Возвращает активную корзину или None"""
 
     order_id = request.session.get('order_id')

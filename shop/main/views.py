@@ -5,10 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-
 from shop import settings
 from .models import Item, Order, Discount
-from .utils import get_active_order
+from .utils import get_active_cart
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -28,7 +27,7 @@ def cart(request):
         'title': 'Cart',
         'stripe_public_key': settings.STRIPE_PUBLISHABLE_KEY,
     }
-    order = get_active_order(request)
+    order = get_active_cart(request)
     if order:
         data['order'] = order
         data['items'] = order.items.all()
@@ -39,7 +38,7 @@ def cart(request):
 def cart_add(request, id):
     if request.method == 'POST':
         item = get_object_or_404(Item, pk=id)
-        order = get_active_order(request)
+        order = get_active_cart(request)
         if order:
             if order.currency != item.currency:
                 messages.warning(request, 'You can only add items with same currency to your cart.')
@@ -60,7 +59,7 @@ def cart_add(request, id):
 def cart_remove(request, id):
     if request.method == 'POST':
         item = get_object_or_404(Item, pk=id)
-        order = get_active_order(request)
+        order = get_active_cart(request)
         if order:
             order.items.remove(item)
             if order.items.exists():
@@ -90,7 +89,7 @@ def buy_item(request, id):
 
 
 def buy_cart(request):
-    order = get_active_order(request)
+    order = get_active_cart(request)
     if not order or not order.items.exists():
         return JsonResponse({'error': 'Cart is empty'}, status=400)
 
@@ -144,15 +143,39 @@ def stripe_webhook(request):
             order.status = Order.Status.FAILED
             order.save()
 
-
     return HttpResponse(status=200)
 
 
 def success_payment(request):
-    messages.info(request, 'The order has been successfully placed')
+    messages.info(request, 'The order has been successfully placed!')
 
-    return redirect('cart')
+    return redirect('main')
 
 
 def apply_promo(request):
-    pass
+    if request.method == 'POST':
+        order = get_active_cart(request)
+        if not order:
+            messages.error(request, 'Cart is empty')
+            return redirect('cart')
+
+        discount = Discount.objects.filter(coupon=request.POST.get('promo')).first()
+        if not discount:
+            messages.error(request, 'Such promocode does not exist.')
+            return redirect('cart')
+
+        order.discount = discount
+        order.calculate_total()
+        order.save()
+
+        messages.success(request, f'Promocode {discount.coupon} applied!')
+        return redirect('cart')
+
+
+def main(request):
+    data = {'title': 'Main'}
+    items = Item.objects.all()
+    data['items_usd'] = [item for item in items if item.currency == Item.Currency.DOLLAR]
+    data['items_rub'] = [item for item in items if item.currency == Item.Currency.RUBLE]
+
+    return render(request, 'main/main.html', data)
